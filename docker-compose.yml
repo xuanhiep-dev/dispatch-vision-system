@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  vision-feedback:
+    build: .
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./models:/app/models
+      - ./modules:/app/modules
+      - ./feedback_data:/app/feedback_data
+      - ./demo_videos:/app/demo_videos
+    environment:
+      - PYTHONUNBUFFERED=1
