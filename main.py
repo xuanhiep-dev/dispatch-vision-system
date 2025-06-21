@@ -1,141 +1,15 @@
-import torch.nn.functional as F
-import streamlit as st
+import os
 import cv2
 import torch
+import pandas as pd
+import streamlit as st
 from ultralytics import YOLO
 from torchvision import transforms
 from modules.classifier import ClsModel
-import streamlit.components.v1 as components
-import numpy as np
-from PIL import Image
-import base64
-from io import BytesIO
-import os
+from modules.frame_processor import FrameProcessor
 
-# Draw function
-
-
-def draw_box_with_label(frame, box, class_name, alpha=0.3):
-    display_colors = {'empty': (255, 120, 0), 'not_empty': (
-        0, 130, 255), 'kakigori': (255, 110, 255)}
-    display_labels = {'empty': 'Empty',
-                      'not_empty': 'Not Empty', 'kakigori': 'Kakigori'}
-    display_label = display_labels[class_name]
-    color = display_colors[class_name]
-    x1, y1, x2, y2 = map(int, box)
-
-    overlay = frame.copy()
-    cv2.rectangle(overlay, (x1, y1), (x2, y2), color, -1)
-    cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0, frame)
-    cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
-
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    font_scale = 0.75
-    thickness = 2
-    text_size = cv2.getTextSize(display_label, font, font_scale, thickness)[0]
-    text_x = x1
-    text_y = y1 - 10 if y1 - 10 > 20 else y2 + text_size[1] + 10
-    cv2.rectangle(frame, (text_x, text_y -
-                  text_size[1] - 5), (text_x + text_size[0] + 5, text_y + 5), color, -1)
-    cv2.putText(frame, display_label, (text_x + 2, text_y),
-                font, font_scale, (0, 0, 0), 3, cv2.LINE_AA)
-    cv2.putText(frame, display_label, (text_x + 2, text_y), font,
-                font_scale, (255, 255, 255), 2, cv2.LINE_AA)
-
-
-def seconds_to_hms(seconds):
-    hours = int(seconds // 3600)
-    minutes = int((seconds % 3600) // 60)
-    secs = int(seconds % 60)
-    return f"{hours:02d}:{minutes:02d}:{secs:02d}"
-
-
-def process_frame_and_detect(frame, transform, det_model, dish_model, dish_classes, tray_model, tray_classes):
-    results = det_model(frame, imgsz=1312, augment=False)
-    boxes = results[0].boxes.xyxy.cpu().numpy()
-    class_ids = results[0].boxes.cls.cpu().numpy()
-
-    scores = results[0].boxes.conf.cpu().numpy()
-
-    # Chỉ lấy box có confidence >= 85%
-    threshold = 0.80
-    valid_idx = scores >= threshold
-
-    boxes = boxes[valid_idx]
-    class_ids = class_ids[valid_idx]
-    scores = scores[valid_idx]
-
-    detected_objects = []
-
-    dish_crops, dish_coords = [], []
-    tray_crops, tray_coords = [], []
-    dish_crops_images, tray_crops_images = [], []
-
-    for box, class_id in zip(boxes, class_ids):
-        x1, y1, x2, y2 = map(int, box)
-        crop = frame[y1:y2, x1:x2]
-        if crop.shape[0] == 0 or crop.shape[1] == 0:
-            continue
-
-        crop_tensor = transform(crop).unsqueeze(0)
-        if class_id == 0:  # dish
-            dish_crops.append(crop_tensor)
-            dish_coords.append((x1, y1, x2, y2))
-            dish_crops_images.append(crop)
-        else:  # tray
-            tray_crops.append(crop_tensor)
-            tray_coords.append((x1, y1, x2, y2))
-            tray_crops_images.append(crop)
-
-    if dish_crops:
-        dish_batch = torch.cat(dish_crops, dim=0)
-        dish_outputs = dish_model(dish_batch)
-        probs = F.softmax(dish_outputs, dim=1)
-        dish_probs, dish_preds = torch.max(probs, dim=1)
-        dish_probs = dish_probs.detach().cpu().numpy()
-        dish_preds = dish_preds.detach().cpu().numpy()
-        for (x1, y1, x2, y2), pred_class, prob, crop_img in zip(dish_coords, dish_preds, dish_probs, dish_crops_images):
-            class_name = dish_classes[pred_class]
-            draw_box_with_label(frame, (x1, y1, x2, y2), class_name)
-            detected_objects.append({
-                'box': (x1, y1, x2, y2),
-                'predicted_label': class_name,
-                'probability': float(prob),
-                'crop': crop_img
-            })
-
-    if tray_crops:
-        tray_batch = torch.cat(tray_crops, dim=0)
-        tray_outputs = tray_model(tray_batch)
-        probs = F.softmax(tray_outputs, dim=1)
-        tray_probs, tray_preds = torch.max(probs, dim=1)
-        tray_probs = tray_probs.detach().cpu().numpy()
-        tray_preds = tray_preds.detach().cpu().numpy()
-        for (x1, y1, x2, y2), pred_class, prob, crop_img in zip(tray_coords, tray_preds, tray_probs, tray_crops_images):
-            class_name = tray_classes[pred_class]
-            draw_box_with_label(frame, (x1, y1, x2, y2), class_name)
-            detected_objects.append({
-                'box': (x1, y1, x2, y2),
-                'predicted_label': class_name,
-                'probability': float(prob),
-                'crop': crop_img
-            })
-
-    return frame, detected_objects
-
-
-def image_to_base64(img_array):
-    img_rgb = cv2.cvtColor(img_array, cv2.COLOR_BGR2RGB)
-    pil_img = Image.fromarray(img_rgb)
-    buffer = BytesIO()
-    pil_img.save(buffer, format="PNG")
-    img_bytes = buffer.getvalue()
-    base64_str = base64.b64encode(img_bytes).decode()
-    return base64_str
 
 # Main app
-
-
 def main():
     st.set_page_config(page_title="Vision Feedback System", layout="wide")
     st.title("Kitchen Dispatch Vision Feedback System")
@@ -155,6 +29,10 @@ def main():
                              std=(0.229, 0.224, 0.225))
     ])
 
+    # Define a frame processor
+    frame_processor = FrameProcessor(
+        transform, det_model, dish_model, dish_classes, tray_model, tray_classes)
+
     video_path = 'demo_videos/demo_video.mp4'
     cap = cv2.VideoCapture(video_path)
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -162,47 +40,62 @@ def main():
     total_duration = total_frames / fps
     cap.release()
 
-    if 'selected_time' not in st.session_state:
-        st.session_state.selected_time = 0.0
+    st.markdown("""
+        <style>
+        div[data-testid="stSlider"] {
+            border: 2px solid #e7e5e5;
+            padding: 10px;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+        div[data-testid="stHorizontalBlock"]>div[data-testid="stColumn"]:nth-of-type(2)>div[data-testid="stVerticalBlock"] {
+            overflow: auto;
+            height: 75vh;
+        }
+        </style>
+    """, unsafe_allow_html=True)
 
-    selected_seconds = st.slider("Select time:", 0.0, total_duration,
-                                 st.session_state.selected_time, step=1.0, format="%.0f")
-
-    frame_idx = int(selected_seconds * fps)
-    frame_idx = min(frame_idx, total_frames - 1)
-
-    cap = cv2.VideoCapture(video_path)
-    cap.set(cv2.CAP_PROP_POS_FRAMES, frame_idx)
-    ret, frame = cap.read()
-    cap.release()
-
-    left, right = st.columns([2, 1])
-
-    if ret:
-        processed_frame, detected_objects = process_frame_and_detect(frame.copy(
-        ), transform, det_model, dish_model, dish_classes, tray_model, tray_classes)
-
+    with st.container():
+        left, right = st.columns([2, 1], border=True)
         with left:
-            st.image(processed_frame, channels="BGR", use_column_width=True)
-            st.markdown(
-                f"<p style='text-align:center; font-size:18px; color:black; font-weight:bold;'>"
-                f"Time {seconds_to_hms(selected_seconds)} | Frame {frame_idx}"
-                f"</p>", unsafe_allow_html=True
-            )
+            # Tạo list các giá trị thời gian dưới dạng string HH:MM:SS
+            time_options = [frame_processor.seconds_to_hms(
+                sec) for sec in range(int(total_duration) + 1)]
+
+            # Slider nằm ngay trên video
+            selected_time_str = st.select_slider(
+                "Select time:", options=time_options)
+
+            # Chuyển ngược lại sang giây để xử lý logic
+            h, m, s = map(int, selected_time_str.split(':'))
+            selected_seconds = h * 3600 + m * 60 + s
+
+            # Tính frame idx
+            frame_idx = int(selected_seconds * fps)
+            frame_idx = min(frame_idx, total_frames - 1)
+
+            # Load frame
+            cap = cv2.VideoCapture(video_path)
+            cap.set(cv2.CAP_PROP_POS_FRAMES, frame_idx)
+            ret, frame = cap.read()
+            cap.release()
+
+            # Hiển thị ảnh sau slider
+            if ret:
+                processed_frame, detected_objects = frame_processor.process_frame_and_detect(
+                    frame.copy())
+                st.image(processed_frame, channels="BGR",
+                         use_container_width=True)
+                st.markdown(
+                    f"<p style='text-align:center; font-size:18px; color:black; font-weight:bold;'>"
+                    f"Time {frame_processor.seconds_to_hms(selected_seconds)} | Frame {frame_idx}"
+                    f"</p>", unsafe_allow_html=True
+                )
+            else:
+                st.warning("Cannot read frame!")
 
         with right:
-            scroll_container = st.container()
-            with scroll_container:
-                st.markdown("""
-                    <style>
-                    div[data-testid="column"]:nth-of-type(2) > div {
-                        height: 68vh;
-                        overflow-y: auto;
-                        border: 1px solid #ddd;
-                        padding: 10px;
-                    }
-                    </style>
-                """, unsafe_allow_html=True)
+            if ret:
                 for idx, obj in enumerate(detected_objects):
                     x1, y1, x2, y2 = obj['box']
                     crop_img = obj['crop']
@@ -210,36 +103,50 @@ def main():
                     st.write(f"### Object #{idx+1}")
                     st.image(cv2.cvtColor(
                         crop_img, cv2.COLOR_BGR2RGB), width=150)
-                    st.write(f"**Bounding Box:** ({x1}, {y1}), ({x2}, {y2})")
-                    st.write(f"**Predicted label:** {obj['predicted_label']}")
-                    st.write(f"**Confidence:** {obj['probability']*100:.2f}%")
+                    st.write(
+                        f"**Bounding Box:** ({x1}, {y1}), ({x2}, {y2})")
+                    st.write(
+                        f"**Detection label:** {obj['detection_label']} - **Classfication label:** {obj['classfication_label']}")
+                    st.write(
+                        f"**Confidence:** {obj['probability']*100:.2f}%")
 
-                    label_options = ['empty', 'not_empty', 'kakigori']
-                    selected_label = st.selectbox(
-                        "Correct label:",
-                        options=label_options,
-                        index=label_options.index(obj['predicted_label']),
-                        key=f"correct_label_{idx}"
+                    detection_key = f"correct_detection_label_{idx}"
+                    classification_key = f"correct_classification_label_{idx}"
+                    detection_options = ['dish', 'tray']
+                    classification_options = ['empty', 'not_empty', 'kakigori']
+
+                    st.session_state.setdefault(
+                        detection_key, obj['detection_label'])
+                    st.session_state.setdefault(
+                        classification_key, obj['classfication_label'])
+
+                    selected_detection_label = st.selectbox(
+                        "Correct detection class for this object:",
+                        options=detection_options,
+                        key=detection_key
+                    )
+
+                    selected_classification_label = st.selectbox(
+                        "Correct classification label for this object:",
+                        options=classification_options,
+                        key=classification_key
                     )
 
                     if st.button(f"Save Feedback for Object #{idx+1}", key=f"save_feedback_{idx}"):
-                        import pandas as pd
-
                         feedback_dir = "feedback_data"
                         os.makedirs(feedback_dir, exist_ok=True)
                         feedback_file = os.path.join(
                             feedback_dir, "feedback.csv")
 
-                        # Nếu file chưa tồn tại thì tạo file mới kèm header
+                        # Create headlines
                         if not os.path.exists(feedback_file):
                             df = pd.DataFrame(columns=[
-                                "time", "frame", "x1", "y1", "x2", "y2",
-                                "predicted_label", "probability", "corrected_label"
-                            ])
+                                "time", "frame", "x1", "y1", "x2", "y2", "predicted_object_label", "corrected_object_label",
+                                "predicted_class_label", "corrected_class_label", "probability"])
                         else:
                             df = pd.read_csv(feedback_file)
 
-                        # Xoá các dòng trùng (cùng frame và cùng tọa độ)
+                        # Remove duplicat lines (same frame and coordinations)
                         duplicate_condition = (
                             (df["frame"] == frame_idx) &
                             (df["x1"] == x1) &
@@ -249,30 +156,27 @@ def main():
                         )
                         df = df[~duplicate_condition]
 
-                        # Thêm dòng mới
+                        # Add a new line
                         new_row = {
-                            "time": seconds_to_hms(selected_seconds),
+                            "time": frame_processor.seconds_to_hms(selected_seconds),
                             "frame": frame_idx,
                             "x1": x1,
                             "y1": y1,
                             "x2": x2,
                             "y2": y2,
-                            "predicted_label": obj['predicted_label'],
+                            "predicted_object_label": obj['detection_label'],
+                            "corrected_object_label": selected_detection_label,
+                            "predicted_class_label": obj['classfication_label'],
+                            "corrected_class_label": selected_classification_label,
                             "probability": obj['probability'],
-                            "corrected_label": selected_label
                         }
                         df = pd.concat(
                             [df, pd.DataFrame([new_row])], ignore_index=True)
 
-                        # Ghi lại toàn bộ file
+                        # Recored the results
                         df.to_csv(feedback_file, index=False)
 
-                        st.success(f"✅ Feedback saved for Object #{idx+1}!")
-
-                    st.markdown("---")
-
-    else:
-        st.warning("Cannot read frame!")
+                        st.success(f"Feedback saved for Object #{idx+1}!")
 
 
 if __name__ == "__main__":
