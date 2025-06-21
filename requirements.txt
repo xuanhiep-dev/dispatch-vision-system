@@ -5,3 +5,4 @@ torchvision
 ultralytics
 Pillow
 gdown
+timm

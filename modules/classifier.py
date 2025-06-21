@@ -1,17 +1,16 @@
 import torch
 import torch.nn as nn
 from torchvision import models
-import timm  # Thư viện mạnh mẽ chứa ConvNeXt
+import timm
 
 
 class ClsModel(nn.Module):
     def __init__(self, num_classes=3):
         super(ClsModel, self).__init__()
 
-        # Load ConvNeXt-Tiny backbone từ timm
+        # Load backbone
         self.backbone = timm.create_model('convnext_tiny', pretrained=True)
 
-        # Thay thế head classifier của ConvNeXt
         in_features = self.backbone.head.fc.in_features
         self.backbone.head.fc = nn.Sequential(
             nn.Linear(in_features, 512),
