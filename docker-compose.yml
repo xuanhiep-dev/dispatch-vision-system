@@ -8,7 +8,9 @@ services:
     volumes:
       - ./models:/app/models
       - ./modules:/app/modules
+      - ./results:/app/results
       - ./feedback_data:/app/feedback_data
       - ./demo_videos:/app/demo_videos
+      - ./Dataset:/app/Dataset
     environment:
       - PYTHONUNBUFFERED=1

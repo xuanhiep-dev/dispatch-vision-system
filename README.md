@@ -19,8 +19,12 @@ After training, three models are generated: best.pth (detection model), cls_dish
 ## 4. Inference.
 ### 4.1. Load streamlit tool.
 The project is developed using the Streamlit tool. To execute the project:
+Since the port is mapped as 8501:8501 in docker-compose.yml, you can open your browser and access the application at:
+http://localhost:8501 or http://127.0.0.1:8501
 ```bash
-streamlit run main.py
+git clone https://github.com/XuanHiepp/kitchen-dispatch-inspection.git
+cd kitchen-dispatch-inspection
+docker-compose up --build
 ```
 ### 4.2. Get the project output.
 ### The project interface has several main features:
