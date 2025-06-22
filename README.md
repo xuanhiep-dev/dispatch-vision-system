@@ -30,20 +30,20 @@ http://localhost:8501 or http://127.0.0.1:8501
 1. The left column displays the prediction results in image format, with bounding boxes and corresponding object labels.
 2. The right column presents detailed information, including bounding box coordinates, detection labels, and classification labels.
 3. The right section provides a feedback feature where users can correct detection and classification labels. The feedback is saved to feedback.csv in the feedback_data directory, recording timestamps, frame indices, object coordinates, predicted and corrected labels, and prediction confidence.
-### To access the file directly inside the container
-Step 1 — Get the running container ID:
+### To access the file directly inside the container:
+Step 1: Get the running container ID:
 ```bash
 docker ps
 ```
-For example, you may see:
+For example, the container ID may be:
 ```bash
 CONTAINER ID   456yhf123mnk   kitchen-inspection-full:latest
 ```
-Step 2 — Enter the container:
+Step 2: Enter the container:
 ```bash
 docker exec -it 456yhf123mnk /bin/bash
 ```
-Step 3 — Navigate to the feedback directory and check the file:
+Step 3: Navigate to the feedback directory and check the file:
 ```bash
 cd /app/feedback_data/
 ls
