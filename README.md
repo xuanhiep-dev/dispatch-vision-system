@@ -1,4 +1,4 @@
-# Installation & Training Guide
+# Installation Guide and Usage Instructions
 ## 1. Install.
 ```bash
 pip install -r requirements.txt
