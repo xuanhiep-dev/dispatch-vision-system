@@ -29,6 +29,8 @@ http://localhost:8501 or http://127.0.0.1:8501
 ### The project interface has several main features:
 1. The left column displays the prediction results in image format, with bounding boxes and corresponding object labels.
 2. The right column presents detailed information, including bounding box coordinates, detection labels, and classification labels.
+#### The picture below shows an example of a project result.
+![Project Result](results/project_result.png)
 3. The right section provides a feedback feature where users can correct detection and classification labels. The feedback is saved to feedback.csv in the feedback_data directory, recording timestamps, frame indices, object coordinates, predicted and corrected labels, and prediction confidence.
 ### To access the file directly inside the container:
 Step 1: Get the running container ID:
@@ -49,8 +51,6 @@ cd /app/feedback_data/
 ls
 cat feedback.csv
 ```
-#### The picture below shows an example of a project result.
-![Project Result](results/project_result.png)
-
 #### The picture below shows an example of a feedback result.
 <img src="results/feedback_result.png" alt="Feedback Result" width="350"/>
+<img src="results/feedback_result_2.png" alt="Feedback Result 2" width="350"/>
