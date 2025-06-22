@@ -11,10 +11,12 @@ After training, three models are generated: best.pth (detection model), cls_dish
 
 ## 3. Evaluation on the validation dataset.
 ### 3.1. The valid detection result.
-![Detection Result](results/detection_result.png)
+<img src="results/detection_result.png" alt="Detection Result" width="700"/><br><br>
 ### 3.2. The classification results.
-1. Tray object: 96.68 (Best Val Acc)
-2. Dish object: 96.46 (Best Val Acc)
+| Object Type | Best Validation Accuracy |
+|-------------|--------------------------|
+| Tray        | 96.68%                   |
+| Dish        | 96.46%                   |
 
 ## 4. Inference.
 ### 4.1. Load streamlit tool.
@@ -48,7 +50,7 @@ cd /app/feedback_data/
 ls
 cat feedback.csv
 ```
-Users can correct both detection and classification results through the following interface:<br>
+Users can correct both detection and classification results through the following interface:<br><br>
 <img src="results/feedback_result.png" alt="Feedback Result" width="350"/><br><br>
-All submitted feedback is stored in `feedback.csv` as shown below:<br>
+All submitted feedback is stored in `feedback.csv` as shown below:<br><br>
 <img src="results/feedback_result_2.png" alt="Feedback Result 2"/>
