@@ -58,19 +58,14 @@ def main():
     with st.container():
         left, right = st.columns([2, 1], border=True)
         with left:
-            # Tạo list các giá trị thời gian dưới dạng string HH:MM:SS
             time_options = [frame_processor.seconds_to_hms(
                 sec) for sec in range(int(total_duration) + 1)]
 
-            # Slider nằm ngay trên video
             selected_time_str = st.select_slider(
                 "Select time:", options=time_options)
 
-            # Chuyển ngược lại sang giây để xử lý logic
             h, m, s = map(int, selected_time_str.split(':'))
             selected_seconds = h * 3600 + m * 60 + s
-
-            # Tính frame idx
             frame_idx = int(selected_seconds * fps)
             frame_idx = min(frame_idx, total_frames - 1)
 
@@ -80,7 +75,7 @@ def main():
             ret, frame = cap.read()
             cap.release()
 
-            # Hiển thị ảnh sau slider
+            # Show image result
             if ret:
                 processed_frame, detected_objects = frame_processor.process_frame_and_detect(
                     frame.copy())
