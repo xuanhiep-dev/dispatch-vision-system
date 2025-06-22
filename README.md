@@ -9,7 +9,7 @@ pip install -r requirements.txt
 2. Train a classification model to categorize the detected objects into three classes: "not_empty", "empty", and "kakigori".
 After training, three models are generated: best.pth (detection model), cls_dish_best.pth, and cls_tray_best.pth (classification models).
 
-# 3. Evaluation on the validation dataset.
+## 3. Evaluation on the validation dataset.
 ### 3.1. The valid detection result.
 ![Detection Result](results/detection_result.png)
 ### 3.2. The classification results.
