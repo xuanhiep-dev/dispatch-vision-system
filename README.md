@@ -32,4 +32,4 @@ streamlit run main.py
 ![Project Result](results/project_result.png)
 
 #### The picture below shows an example of a feedback result.
-<img src="results/feedback_result.png" alt="Feedback Result" width="300"/>
+<img src="results/feedback_result.png" alt="Feedback Result" width="350"/>
