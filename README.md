@@ -28,7 +28,7 @@ http://localhost:8501 or http://127.0.0.1:8501
 ### 4.2. Launch the Streamlit app to use the following features.
 **Feature 1:** The left column displays the prediction results in image format, with bounding boxes and corresponding object labels.<br>
 **Feature 2:** The right column presents detailed information, including bounding box coordinates, detection labels, and classification labels.<br>
-![Project Result](results/project_result.png)<br>
+<img src="results/project_result.png" alt="Project Result"/><br>
 **Feature 3:** The right section provides a feedback feature where users can correct detection and classification labels. The feedback is saved to feedback.csv in the feedback_data directory, recording timestamps, frame indices, object coordinates, predicted and corrected labels, and prediction confidence. To access the file directly inside the container:<br>
 **Step 1:** Get the running container ID:
 ```bash
@@ -48,7 +48,7 @@ cd /app/feedback_data/
 ls
 cat feedback.csv
 ```
-After running the application, users can correct both detection and classification results through the following interface:
-<img src="results/feedback_result.png" alt="Feedback Result" width="350"/>
-All submitted feedback is stored in `feedback.csv` as shown below:
+After running the application, users can correct both detection and classification results through the following interface:<br>
+<img src="results/feedback_result.png" alt="Feedback Result" width="350"/><br>
+All submitted feedback is stored in `feedback.csv` as shown below:<br>
 <img src="results/feedback_result_2.png" alt="Feedback Result 2"/>
