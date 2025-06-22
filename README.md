@@ -29,8 +29,7 @@ http://localhost:8501 or http://127.0.0.1:8501
 ### The project interface has several main features:
 1. The left column displays the prediction results in image format, with bounding boxes and corresponding object labels.
 2. The right column presents detailed information, including bounding box coordinates, detection labels, and classification labels.
-3. Additionally, this section includes a user feedback feature. Users can provide corrections for both detection and classification labels, and the feedback will be saved in a CSV file to support model performance improvement.
-4. The feedback file will be named feedback.csv and stored in the feedback_data directory. This file will record essential information such as: detection timestamp, specific frame index, object coordinates, predicted labels, user feedback labels for both detection and classification tasks, and the prediction confidence score.
+3. The right section provides a feedback feature where users can correct detection and classification labels. The feedback is saved to feedback.csv in the feedback_data directory, recording timestamps, frame indices, object coordinates, predicted and corrected labels, and prediction confidence.
 ### To access the file directly inside the container
 Step 1 — Get the running container ID:
 ```bash
