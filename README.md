@@ -33,4 +33,4 @@ streamlit run main.py
 
 #### The picture below shows an example of a feedback result.
 <img src="results/feedback_result_1.png" alt="Feedback Result 1" width="400"/>
-<img src="results/feedback_result_2.png" alt="Feedback Result 2" width="1500"/>
+<img src="results/feedback_result_2.png" alt="Feedback Result 2" />
