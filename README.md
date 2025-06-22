@@ -10,9 +10,9 @@ pip install -r requirements.txt
 After training, three models are generated: best.pth (detection model), cls_dish_best.pth, and cls_tray_best.pth (classification models).
 
 # 3. Evaluation on the validation dataset.
-### 3.1 The valid detection result.
+### 3.1. The valid detection result.
 ![Detection Result](results/detection_result.png)
-### 3.2 The classification results.
+### 3.2. The classification results.
 1. Tray object: 96.68 (Best Val Acc)
 2. Dish object: 96.46 (Best Val Acc)
 
@@ -24,12 +24,13 @@ streamlit run main.py
 ```
 ### 4.2. Get the project output.
 ### The project interface is divided into two columns:
-1. The left column displays the prediction results in image format, with bounding boxes and corresponding object labels.
-2. The right column presents detailed information, including bounding box coordinates, detection labels, and classification labels.
-### The picture below shows an example of a project result.
+#### 1. The left column displays the prediction results in image format, with bounding boxes and corresponding object labels.
+#### 2. The right column presents detailed information, including bounding box coordinates, detection labels, and classification labels.
+##### The picture below shows an example of a project result.
 ![Project Result](results/project_result.png)
 3. Additionally, this section includes a user feedback feature. Users can provide corrections for both detection and classification labels, and the feedback will be saved in a CSV file to support model performance improvement.
-### The picture below shows an example of a project result.
-![Feedback Result 1](results/feedback_result_1.png)
-![Feedback Result 2](results/feedback_result_1.png)
+##### The picture below shows an example of a feedback result.
+<img src="results/feedback_result_1.png" alt="Feedback Result 1" width="400"/>
+##### The picture below shows an example of a csv file.
+![Feedback Result 2](results/feedback_result_2.png)
 The feedback file will be named feedback.csv and stored in the feedback_data directory. This file will record essential information such as: detection timestamp, specific frame index, object coordinates, predicted labels, user feedback labels for both detection and classification tasks, and the prediction confidence score.
