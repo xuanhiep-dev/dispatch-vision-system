@@ -1,5 +1,5 @@
 # Installation Guide and Usage Instructions
-## 1. Install.
+## 1. Install all required packages.
 ```bash
 pip install -r requirements.txt
 ```
