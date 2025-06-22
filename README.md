@@ -25,8 +25,7 @@ docker run -p 8501:8501 xuanhiepp/kitchen-inspection-full:latest
 ```
 Since the port is mapped as 8501:8501 in docker-compose.yml, you can open your browser and access the application at:
 http://localhost:8501 or http://127.0.0.1:8501
-### 4.2. Get the project output.
-### The project interface has several main features:
+### 4.2. Launch the Streamlit app to use the following features.
 ### 1. The left column displays the prediction results in image format, with bounding boxes and corresponding object labels.
 ### 2. The right column presents detailed information, including bounding box coordinates, detection labels, and classification labels.
 #### The picture below shows an example of a project result.
