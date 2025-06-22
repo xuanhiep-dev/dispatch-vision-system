@@ -1,3 +1,5 @@
 time,frame,x1,y1,x2,y2,predicted_object_label,corrected_object_label,predicted_class_label,corrected_class_label,probability
 00:34:33,62190,1258,144,1343,233,dish,tray,not_empty,empty,0.9096776843070984
 00:34:33,62190,1356,188,1436,277,dish,dish,empty,empty,0.9365875124931335
+00:00:00,0,908,301,1014,410,dish,dish,empty,empty,0.9033761024475098
+01:10:06,126180,1231,153,1319,246,dish,dish,not_empty,kakigori,0.9267836809158325
