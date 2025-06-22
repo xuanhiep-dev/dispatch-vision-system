@@ -1,5 +1,5 @@
 # Installation Guide and Usage Instructions
-## 1. Install.
+## 1. Install all required packages.
 ```bash
 pip install -r requirements.txt
 ```
@@ -11,10 +11,13 @@ After training, three models are generated: best.pth (detection model), cls_dish
 
 ## 3. Evaluation on the validation dataset.
 ### 3.1. The valid detection result.
-![Detection Result](results/detection_result.png)
+<img src="results/detection_result.png" alt="Detection Result" width="700"/>
+
 ### 3.2. The classification results.
-1. Tray object: 96.68 (Best Val Acc)
-2. Dish object: 96.46 (Best Val Acc)
+| Object Type | Best Validation Accuracy |
+|-------------|--------------------------|
+| Tray        | 96.68%                   |
+| Dish        | 96.46%                   |
 
 ## 4. Inference.
 ### 4.1. Load streamlit tool.
@@ -25,14 +28,37 @@ docker run -p 8501:8501 xuanhiepp/kitchen-inspection-full:latest
 ```
 Since the port is mapped as 8501:8501 in docker-compose.yml, you can open your browser and access the application at:
 http://localhost:8501 or http://127.0.0.1:8501
-### 4.2. Get the project output.
-### The project interface has several main features:
-1. The left column displays the prediction results in image format, with bounding boxes and corresponding object labels.
-2. The right column presents detailed information, including bounding box coordinates, detection labels, and classification labels.
-3. Additionally, this section includes a user feedback feature. Users can provide corrections for both detection and classification labels, and the feedback will be saved in a CSV file to support model performance improvement.
-4. The feedback file will be named feedback.csv and stored in the feedback_data directory. This file will record essential information such as: detection timestamp, specific frame index, object coordinates, predicted labels, user feedback labels for both detection and classification tasks, and the prediction confidence score.
-#### The picture below shows an example of a project result.
-![Project Result](results/project_result.png)
+### 4.2. Launch the Streamlit app to use the following features.
+**Feature 1:** The left column displays the prediction results in image format, with bounding boxes and corresponding object labels.
 
-#### The picture below shows an example of a feedback result.
+**Feature 2:** The right column presents detailed information, including bounding box coordinates, detection labels, and classification labels.
+
+<img src="results/project_result.png" alt="Project Result"/><br>
+
+**Feature 3:** The right section provides a feedback feature where users can correct detection and classification labels. The feedback is saved to feedback.csv in the feedback_data directory, recording timestamps, frame indices, object coordinates, predicted and corrected labels, and prediction confidence. To access the file directly inside the container:
+
+**Step 1:** Get the running container ID:
+```bash
+docker ps
+```
+For example, the container ID may be:
+```bash
+CONTAINER ID   456yhf123mnk   kitchen-inspection-full:latest
+```
+**Step 2:** Enter the container:
+```bash
+docker exec -it 456yhf123mnk /bin/bash
+```
+**Step 3:** Navigate to the feedback directory and check the file:
+```bash
+cd /app/feedback_data/
+ls
+cat feedback.csv
+```
+Users can correct both detection and classification results through the following interface:
+
 <img src="results/feedback_result.png" alt="Feedback Result" width="350"/>
+
+All submitted feedback is stored in `feedback.csv` as shown below:
+
+<img src="results/feedback_result_2.png" alt="Feedback Result 2"/>
