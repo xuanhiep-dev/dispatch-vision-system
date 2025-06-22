@@ -20,7 +20,7 @@ After training, three models are generated: best.pth (detection model), cls_dish
 ### 4.1. Load streamlit tool.
 The project is developed using the Streamlit tool. To execute the project:
 ```bash
-git clone https://github.com/XuanHiepp/kitchen-dispatch-inspection.git
+git clone -b main https://github.com/XuanHiepp/kitchen-dispatch-inspection.git
 cd kitchen-dispatch-inspection
 docker-compose up --build
 ```
