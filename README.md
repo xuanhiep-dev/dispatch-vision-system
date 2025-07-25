@@ -5,7 +5,7 @@ This project applies object detection techniques to detect trays, dishes, and se
 
 ---
 
-## 🔍 Features
+## Features
 
 - **Object Detection** of trays, dishes, and food items
 - **Classification** of serving status (empty / not empty / kakigori)
