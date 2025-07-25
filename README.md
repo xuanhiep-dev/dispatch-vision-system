@@ -1,3 +1,42 @@
+# Dispatch Vision System
+
+A computer vision-based inspection system designed to monitor and verify food dispatch workflows.  
+This project applies object detection techniques to detect trays, dishes, and serving statuses (e.g., empty / not empty) to ensure quality and accuracy before meals are delivered.
+
+---
+
+## 🔍 Features
+
+- **Object Detection** of trays, dishes, and food items
+- **Classification** of serving status (empty / not empty / kakigori)
+- Visual output with annotated bounding boxes
+- Real-time or batch-mode processing
+- Modular and easy to integrate into production pipelines
+
+---
+
+## Project Structure
+```
+dispatch-vision-system/
+│
+├── feedback_data/               # User feedback for model correction
+│   └── feedback.csv
+│
+├── modules/                     # Core processing and model modules
+│   ├── classifier.py            # Classification logic (e.g., empty / not_empty / kakigori)
+│   ├── frame_processor.py       # Frame-level pipeline control
+│   ├── preprocess_image_cls.py  # Preprocessing for classification
+│   └── preprocess_image_det.py  # Preprocessing for detection
+│
+├── results/                     # Detection and feedback visualization outputs
+│
+├── tray_dish_detection_classification.ipynb  # Jupyter demo notebook
+├── main.py                      # Main entry point to run the system
+├── Dockerfile                   # Docker container setup
+├── docker-compose.yml           # Docker Compose configuration for running the system
+├── requirements.txt             # Python dependencies
+```
+
 # Installation Guide and Usage Instructions
 ## 1. Install all required packages.
 ```bash
